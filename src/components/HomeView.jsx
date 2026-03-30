@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-import { listContainer, listItem } from '../constants'
+import { listContainer, listItem, TROPHIES, getCompLogo } from '../constants'
 import { HomeMatchCard } from './HomeMatchCard'
+import HistorySection from './HistorySection';
 
 const FALLBACK_HERO =
   'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1920&q=80'
@@ -19,6 +20,7 @@ export function HomeView({ homeData, onNavigate }) {
 
   return (
     <div className="home-page">
+      {/* 1. Hero Section */}
       <div className="home-page-bleed">
         <div
           className="home-hero-site"
@@ -53,13 +55,19 @@ export function HomeView({ homeData, onNavigate }) {
         </div>
       </div>
 
+      {/* 2. Recent Results Section */}
       <section className="home-strip-section">
         <div className="home-strip-head">
           <h2 className="home-strip-title">Recent results</h2>
-          <button type="button" className="home-strip-link" onClick={() => onNavigate('squad')}>
-            View squad →
+          <button 
+            type="button" 
+            className="home-strip-link" 
+            onClick={() => onNavigate('calendar')}
+          >
+            Full calendar →
           </button>
         </div>
+        
         <div className="home-fixture-scroll" role="list">
           {fixtures.slice(0, 8).map((match, index) => (
             <HomeMatchCard key={`${match.MatchDate}-${match.Opponent}-${index}`} match={match} index={index} />
@@ -67,6 +75,48 @@ export function HomeView({ homeData, onNavigate }) {
         </div>
       </section>
 
+      {/* 3. Honors Section */}
+      <motion.div 
+        className="honors-grid" 
+        variants={listContainer} 
+        initial="hidden" 
+        animate="show"
+      >
+        {TROPHIES.map((trophy) => (
+          <motion.div 
+            key={trophy.name} 
+            className="trophy-card" 
+            variants={listItem}
+            whileHover={{ y: -8, scale: 1.02, borderColor: '#edbb00' }}
+          >
+            <div className="trophy-logo-wrap">
+              <img 
+                src={getCompLogo(trophy.name)} 
+                alt={trophy.name} 
+                className="trophy-comp-logo" 
+              />
+            </div>
+
+            <div className="trophy-info-wrap">
+              <div className="trophy-name-top">{trophy.name}</div>
+              <div className="trophy-main-row">
+                <span className="trophy-count-big">{trophy.count}</span>
+                <div className="trophy-info-sub">
+                   <div className="trophy-label-bottom">{trophy.label}</div>
+                   <svg className="mini-gold-cup" viewBox="0 0 24 24">
+                      <path d="M18 2H6v7a6 6 0 0 0 12 0V2ZM4 9V2H2v7a4 4 0 0 0 4 4v2a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2a4 4 0 0 0 4-4V2h-2v7a4 4 0 0 0-4 4H8a4 4 0 0 0-4-4ZM12 17a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm-5 4h10v1H7v-1Z" />
+                   </svg>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* 4. Club History Slider */}
+      <HistorySection />
+
+      {/* 5. Stats Quick Cards (Directly follows History) */}
       <motion.div className="stats-grid" variants={listContainer} initial="hidden" animate="show">
         <motion.div className="card card-stat" variants={listItem} whileHover={{ y: -4 }}>
           <span className="stat-num">{homeData.totalPlayers}</span>
@@ -81,36 +131,36 @@ export function HomeView({ homeData, onNavigate }) {
           <small>Nationalities</small>
         </motion.div>
       </motion.div>
+      <section className="home-partners-branding">
+        <div className="partners-inner">
+          <div className="partners-header">
+            <h3 className="partners-title">Main Partners</h3>
+            <button className="btn-view-partners">VIEW ALL PARTNERS</button>
+          </div>
+          
+          <div className="partners-logos">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg" alt="Nike" className="partner-nike" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Spotify" className="partner-spotify" />
+            <div className="partner-philips">
+              <span className="philips-main">PHILIPS</span>
+              <span className="philips-sub">AMBILIGHT tv</span>
+            </div>
+          </div>
+        </div>
 
-      <h2 className="section-title">Match log</h2>
-      <div className="table-wrap glass-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Competition</th>
-              <th>Opponent</th>
-              <th>Score</th>
-              <th>Result</th>
-            </tr>
-          </thead>
-          <tbody>
-            {homeData.recentMatches.map((match) => (
-              <tr key={`${match.MatchDate}-${match.Opponent}`}>
-                <td>{new Date(match.MatchDate).toLocaleDateString()}</td>
-                <td>{match.competitionName || '—'}</td>
-                <td>{match.Opponent}</td>
-                <td>
-                  {match.GoalsFor}-{match.GoalsAgainst}
-                </td>
-                <td>
-                  <span className={`pill pill-${match.Result.toLowerCase()}`}>{match.Result}</span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+        <div className="socials-inner">
+          <h3 className="socials-title">Follow FC Barcelona on social media</h3>
+          <div className="social-icons">
+            <i className="fab fa-facebook-f"></i>
+            <i className="fab fa-x-twitter"></i>
+            <i className="fab fa-youtube"></i>
+            <i className="fab fa-instagram"></i>
+            <i className="fab fa-spotify"></i>
+            <i className="fab fa-discord"></i>
+            <i className="fab fa-tiktok"></i>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

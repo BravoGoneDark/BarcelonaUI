@@ -1,0 +1,241 @@
+/* src/components/CalendarView.css */
+
+.calendar-view-wrapper {
+  background: rgba(10, 10, 18, 0.9);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  min-height: 600px;
+}
+
+/* Header & Navigation */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #a50044; /* Barca Red */
+}
+
+.month-title {
+  font-size: 2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #edbb00; /* Barca Gold */
+  margin: 0;
+}
+
+.calendar-header button {
+  background: #1a1a2e;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.calendar-header button:hover {
+  background: #a50044;
+  border-color: #edbb00;
+}
+
+/* The Grid */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.weekday-label {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 10px 0;
+  text-transform: uppercase;
+}
+
+/* Individual Days */
+.calendar-day {
+  aspect-ratio: 1 / 1;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 12px;
+  position: relative; /* Needed for absolute children */
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.day-number {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  opacity: 0.4;
+  z-index: 2;
+}
+
+/* Match Day Styling */
+.calendar-day.has-match {
+  background: linear-gradient(145deg, #004d98 0%, #a50044 100%); /* Blaugrana Gradient */
+  border: 1px solid #edbb00;
+  cursor: pointer;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+}
+
+.calendar-day.has-match:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5), 0 0 15px rgba(237, 187, 0, 0.3);
+  z-index: 10;
+}
+
+.calendar-day.has-match .day-number {
+  opacity: 1;
+  color: #edbb00;
+}
+
+/* New Match Content Layout */
+.match-content {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* Competition Logo - Top Right */
+.comp-icon-top {
+  position: absolute;
+  top: -2px; /* Adjusted to sit nicely opposite the number */
+  right: -2px;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+/* Opponent Logo - Dead Center */
+.team-logo-center-wrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.team-logo-center {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6));
+}
+
+/* Result Tag - Bottom Center */
+.result-tag {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.85rem;
+  font-weight: 900;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  letter-spacing: 1px;
+}
+
+.res-win { color: #00ff88; }
+.res-loss { color: #ff4444; }
+.res-draw { color: #aaaaaa; }
+
+/* Loading State */
+.loading-strip {
+  text-align: center;
+  padding: 5rem;
+  font-size: 1.5rem;
+  color: #edbb00;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+}
+
+/* --- FIFA Style Modal --- */
+.fifa-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(6, 8, 14, 0.9);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.fifa-modal {
+  background: #15151e;
+  width: 90%;
+  max-width: 600px;
+  border: 1px solid #edbb00;
+  padding: 3rem;
+  text-align: center;
+  box-shadow: 0 0 50px rgba(0,0,0,0.8);
+  position: relative;
+  overflow: hidden;
+}
+
+.fifa-modal::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 6px;
+  background: linear-gradient(to right, #004d98, #a50044);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.5);
+}
+
+.modal-matchup {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin: 2rem 0;
+}
+
+.m-team img { width: 110px; height: 110px; margin-bottom: 1rem; }
+.m-team p { font-weight: 900; font-size: 1.2rem; margin: 0; }
+.m-score { font-size: 5rem; font-weight: 900; color: #fff; text-shadow: 0 0 20px rgba(237, 187, 0, 0.4); }
+
+.modal-date {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #888;
+  margin-bottom: 2rem;
+}
+
+.modal-close {
+  background: #edbb00;
+  color: #000;
+  border: none;
+  padding: 1rem 3rem;
+  font-weight: 900;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.modal-close:hover {
+  transform: scale(1.05);
+  background: #fff;
+}

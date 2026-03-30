@@ -588,7 +588,8 @@ h1 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 14px;
-  margin: 24px 0;
+  margin: 40px auto;
+  max-width: 900px; /* Centering the stats as well */
 }
 
 .card {
@@ -1031,4 +1032,237 @@ select:focus {
   .bar-row strong {
     justify-self: start;
   }
+}
+
+/* --- FINAL HONORS STYLING --- */
+
+.honors-grid {
+  display: grid;
+  /* Using auto-fill so cards don't stretch too thin on wide monitors */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+  gap: 24px;
+  
+  /* 1. INCREASED GAP: 80px top/bottom pushes results and stats away */
+  /* 2. CENTERING: 'auto' left/right centers the entire grid block */
+  margin: 80px auto; 
+  
+  /* Constrains the width so it doesn't touch the panel edges on wide screens */
+  max-width: 1100px; 
+  
+  /* Centers the individual cards within the grid if they don't fill a row */
+  justify-content: center; 
+}
+
+.trophy-card {
+  position: relative;
+  background: #08090d;
+  height: 160px;
+  border-radius: 14px;
+  display: grid;
+  /* Reduced logo column slightly to give more room to the text */
+  grid-template-columns: 85px 1fr; 
+  align-items: center;
+  padding: 0 20px;
+  border: 1px solid rgba(237, 187, 0, 0.2);
+  overflow: hidden;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6);
+}
+
+.trophy-comp-logo {
+  width: 80px; /* Larger logo size */
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(237, 187, 0, 0.1));
+}
+
+.trophy-info-wrap {
+  display: flex;
+  flex-direction: column;
+  padding-left: 10px;
+  /* Prevents children from pushing the container width */
+  min-width: 0;
+}
+
+.trophy-name-top {
+  font-family: var(--fcb-font-display, 'Orbitron', sans-serif);
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: -5px; /* Pulls the number closer to the title */
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.trophy-main-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* Ensures items stay on one line but shrink if needed */
+  flex-wrap: nowrap;
+}
+
+.trophy-count-big {
+  font-family: var(--fcb-font-display, 'Orbitron', sans-serif);
+  /* Reduced from 5rem to 4rem to prevent overflow */
+  font-size: 4rem; 
+  font-weight: 900;
+  color: #edbb00;
+  line-height: 1;
+  flex-shrink: 0; /* Number stays big */
+}
+
+.trophy-info-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mini-gold-cup {
+  width: 12px;
+  height: 12px;
+  fill: #edbb00;
+}
+
+.trophy-label-bottom {
+  font-family: var(--fcb-font-display, 'Orbitron', sans-serif);
+  /* Reduced font size slightly */
+  font-size: 0.6rem; 
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  /* Prevents "TROPHIES" from getting cut off */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- PARTNERS & SOCIALS SECTION --- */
+
+.home-partners-branding {
+  margin-top: 100px;
+  /* Stretches to the very edge of the panel */
+  margin-left: calc(-1 * var(--home-pad));
+  margin-right: calc(-1 * var(--home-pad));
+  padding: 80px 40px;
+  background: #0f101b;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 80px;
+}
+
+.partners-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+}
+
+.partners-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 50px;
+}
+
+.partners-title {
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--fcb-font-display, 'Orbitron', sans-serif);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+.btn-view-partners {
+  position: absolute;
+  right: 0;
+  background: #db172c;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  font-family: var(--fcb-font-display, 'Orbitron', sans-serif);
+  font-size: 0.65rem;
+  font-weight: 800;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.btn-view-partners:hover {
+  transform: scale(1.05);
+  background: #ff1a35;
+}
+
+.partners-logos {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 60px;
+}
+
+.partner-nike {
+  height: 45px;
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+}
+
+.partner-spotify {
+  height: 55px;
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+}
+
+.partner-philips {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff;
+  font-family: 'Arial Black', sans-serif;
+  line-height: 0.9;
+  opacity: 0.9;
+}
+
+.philips-main {
+  font-size: 1.8rem;
+  font-weight: 900;
+}
+
+.philips-sub {
+  font-size: 1.4rem;
+  font-weight: 400;
+}
+
+/* Social Media Row */
+.socials-inner {
+  text-align: center;
+}
+
+.socials-title {
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 30px;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 35px;
+}
+
+.social-icons i {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.social-icons i:hover {
+  color: #edbb00;
+  transform: translateY(-5px);
 }

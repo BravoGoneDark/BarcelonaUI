@@ -8,6 +8,8 @@ import { PlayerView } from './components/PlayerView'
 import { SquadView } from './components/SquadView'
 import { StatsView } from './components/StatsView'
 import { TabPanel } from './components/TabPanel'
+import CalendarView from './components/CalendarView'
+import Footer from './components/Footer' // Imported the Footer
 import './App.css'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
@@ -152,7 +154,12 @@ function App() {
         <AnimatePresence mode="wait">
           {activeTab === 'home' && homeData && (
             <TabPanel key="home" className="content home-content">
-              <HomeView homeData={homeData} onNavigate={setActiveTab} />
+              {/* Passed statsData here just in case you use leaders/scorers later */}
+              <HomeView 
+                homeData={homeData} 
+                statsData={statsData} 
+                onNavigate={setActiveTab} 
+              />
             </TabPanel>
           )}
 
@@ -197,7 +204,16 @@ function App() {
               />
             </TabPanel>
           )}
+          
+          {activeTab === 'calendar' && (
+            <TabPanel key="calendar" className="content">
+              <CalendarView />
+            </TabPanel>
+          )}
         </AnimatePresence>
+
+        {/* Global Footer appears on every page at the very bottom of the panel */}
+        <Footer onNavigate={setActiveTab} />
       </section>
     </main>
   )

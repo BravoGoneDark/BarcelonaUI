@@ -280,6 +280,33 @@ app.post('/api/admin/lock-table', async (req, res) => {
   }
 })
 
+// Get all matches for the Calendar View
+app.get('/api/matches/all', async (_req, res) => {
+  try {
+    const [matches] = await pool.query(`
+      SELECT 
+        m.MatchID, 
+        m.MatchDate, 
+        m.Opponent, 
+        m.GoalsFor, 
+        m.GoalsAgainst, 
+        m.Result, 
+        m.Venue,
+        c.CompName AS competitionName
+      FROM MATCHES m
+      LEFT JOIN COMPETITION c ON m.CompetitionID = c.CompetitionID
+      ORDER BY m.MatchDate ASC
+    `)
+
+    res.json({
+      ok: true,
+      data: matches,
+    })
+  } catch (error) {
+    sendError(res, error, 'Could not fetch matches for calendar')
+  }
+})
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`)
 })
