@@ -1,0 +1,34 @@
+:root {
+  --fcb-garnet: #a50044;
+  --fcb-blue: #004d98;
+  --fcb-gold: #edbb00;
+  --fcb-bg-deep: #0a0b0f;
+  --fcb-bg-mid: #12141c;
+  --fcb-surface: rgba(22, 24, 34, 0.72);
+  --fcb-text: #f0f2f8;
+  --fcb-muted: #9aa3b5;
+  /* Rajdhani: body / UI; Orbitron: titles & numerals; Great Vibes: motto accent (loaded in index.html) */
+  --fcb-font-sans: 'Rajdhani', system-ui, sans-serif;
+  --fcb-font-display: 'Orbitron', var(--fcb-font-sans);
+  --fcb-font-motto: 'Great Vibes', cursive;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--fcb-font-sans);
+  font-weight: 500;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  color: var(--fcb-text);
+  background: var(--fcb-bg-deep);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+#root {
+  min-height: 100vh;
+}
