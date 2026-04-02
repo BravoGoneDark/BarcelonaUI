@@ -87,6 +87,7 @@ app.get('/api/players', async (req, res) => {
   try {
     let sql = `
       SELECT p.PlayerID, p.PlayerName, p.Position, p.Nationality, p.JerseyNumber, p.Skill,
+             p.ImageURL,
              s.Goals, s.Assists, s.AvgRating
       FROM PLAYER p
       LEFT JOIN STATS s ON p.StatsID = s.StatsID
@@ -117,6 +118,7 @@ app.get('/api/players/:id', async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT p.PlayerID, p.PlayerName, p.Age, p.Skill, p.Position, p.Nationality, p.JerseyNumber,
+              p.ImageURL,
               s.Goals, s.Assists, s.AvgRating
        FROM PLAYER p
        LEFT JOIN STATS s ON p.StatsID = s.StatsID
