@@ -9,7 +9,7 @@ import { SquadView } from './components/SquadView'
 import { StatsView } from './components/StatsView'
 import { TabPanel } from './components/TabPanel'
 import CalendarView from './components/CalendarView'
-import Footer from './components/Footer' // Imported the Footer
+import Footer from './components/Footer' 
 import './App.css'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'

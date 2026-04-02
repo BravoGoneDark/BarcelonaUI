@@ -181,3 +181,31 @@ INSERT INTO PLAYER (PlayerName, Age, Skill, Position, Nationality, JerseyNumber,
 ('Ferran Torres', 24, 82, 'Forward', 'Spain', 7, 17),
 ('Pau Victor', 23, 79, 'Forward', 'Spain', 18, 24),
 ('Ansu Fati', 22, 81, 'Forward', 'Spain', 10, 18);
+
+DROP TRIGGER IF EXISTS before_match_insert;
+
+DELIMITER $$
+CREATE TRIGGER before_match_insert
+BEFORE INSERT ON MATCHES
+FOR EACH ROW
+BEGIN
+    DECLARE existingMatch INT DEFAULT 0;
+
+    SELECT COUNT(*) INTO existingMatch
+    FROM MATCHES
+    WHERE MatchDate = NEW.MatchDate;
+
+    IF existingMatch > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'A match is already scheduled on this date.';
+    END IF;
+
+    IF NEW.GoalsFor > NEW.GoalsAgainst THEN
+        SET NEW.Result = 'Win';
+    ELSEIF NEW.GoalsFor < NEW.GoalsAgainst THEN
+        SET NEW.Result = 'Loss';
+    ELSE
+        SET NEW.Result = 'Draw';
+    END IF;
+END$$
+DELIMITER ;
