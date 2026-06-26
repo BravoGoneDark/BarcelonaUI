@@ -8,6 +8,7 @@ import { PlayerView } from './components/PlayerView'
 import { SquadView } from './components/SquadView'
 import { StatsView } from './components/StatsView'
 import { TabPanel } from './components/TabPanel'
+import { SplashScreen } from './components/SplashScreen'
 import CalendarView from './components/CalendarView'
 import Footer from './components/Footer' 
 import './App.css'
@@ -32,6 +33,7 @@ function App() {
     skill: '',
     tableName: 'PLAYER',
   })
+  const [splashDone, setSplashDone] = useState(false)
 
   const patchAdminForm = (patch) => {
     setAdminForm((prev) => ({ ...prev, ...patch }))
@@ -47,6 +49,13 @@ function App() {
   }
 
   const fetchHome = async () => setHomeData(await fetchJson('/api/home-summary'))
+
+  const [recentFixtures, setRecentFixtures] = useState([])
+
+  const fetchRecentFixtures = async () => {
+    const data = await fetchJson('/api/fixtures/recent')
+    setRecentFixtures(data)
+  }
 
   const fetchPlayers = async () => {
     const query = new URLSearchParams({
@@ -65,7 +74,7 @@ function App() {
     setIsLoading(true)
     setError('')
     try {
-      await Promise.all([fetchHome(), fetchPlayers(), fetchPlayerDetail(selectedPlayerId), fetchStats()])
+      await Promise.all([fetchHome(), fetchPlayers(), fetchPlayerDetail(selectedPlayerId), fetchStats(), fetchRecentFixtures()])
     } catch (requestError) {
       setError(requestError.message)
     } finally {
@@ -134,9 +143,19 @@ function App() {
   }
 
   return (
-    <main className="app-shell">
-      <AppBackground />
+  <main className="app-shell">
+    <AnimatePresence>
+      {!splashDone && <SplashScreen onComplete={() => setSplashDone(true)} />}
+    </AnimatePresence>
 
+    {/* Site fades in after splash */}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: splashDone ? 1 : 0 }}
+      transition={{ duration: 1.5, ease: 'easeIn' }}
+      style = {{ position: 'static'}}
+    >
+      <AppBackground />
       <section className="panel">
         <AppHeader activeTab={activeTab} onTabChange={setActiveTab} />
 
@@ -154,15 +173,9 @@ function App() {
         <AnimatePresence mode="wait">
           {activeTab === 'home' && homeData && (
             <TabPanel key="home" className="content home-content">
-              {/* Passed statsData here just in case you use leaders/scorers later */}
-              <HomeView 
-                homeData={homeData} 
-                statsData={statsData} 
-                onNavigate={setActiveTab} 
-              />
+              <HomeView homeData={homeData} statsData={statsData} onNavigate={setActiveTab} recentFixtures={recentFixtures} />
             </TabPanel>
           )}
-
           {activeTab === 'squad' && (
             <TabPanel key="squad" className="content">
               <SquadView
@@ -179,19 +192,16 @@ function App() {
               />
             </TabPanel>
           )}
-
           {activeTab === 'player' && playerDetail && (
             <TabPanel key="player" className="content player-page">
               <PlayerView playerDetail={playerDetail} />
             </TabPanel>
           )}
-
           {activeTab === 'stats' && statsData && (
             <TabPanel key="stats" className="content">
               <StatsView statsData={statsData} />
             </TabPanel>
           )}
-
           {activeTab === 'admin' && (
             <TabPanel key="admin" className="content admin-content">
               <AdminView
@@ -204,7 +214,6 @@ function App() {
               />
             </TabPanel>
           )}
-          
           {activeTab === 'calendar' && (
             <TabPanel key="calendar" className="content">
               <CalendarView />
@@ -212,11 +221,11 @@ function App() {
           )}
         </AnimatePresence>
 
-        {/* Global Footer appears on every page at the very bottom of the panel */}
         <Footer onNavigate={setActiveTab} />
       </section>
-    </main>
-  )
+    </motion.div>
+  </main>
+)
 }
 
 export default App

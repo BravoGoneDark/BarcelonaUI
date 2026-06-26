@@ -1,59 +1,97 @@
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { listContainer, listItem, TROPHIES, getCompLogo } from '../constants'
 import { HomeMatchCard } from './HomeMatchCard'
+import { MatchStatsModal } from './MatchStatsModal'
 import HistorySection from './HistorySection';
 
-const FALLBACK_HERO =
-  'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1920&q=80'
+const HERO_SLIDES = [
+  '/pre-match.avif',
+  '/stadium-2.avif',
+  '/messi-ballon.avif',
+  '/fans.avif',
+  '/hero-stadium.avif',
+]
 
-export function HomeView({ homeData, onNavigate }) {
-  const [heroUrl, setHeroUrl] = useState('/hero-stadium.avif')
+export function HomeView({ homeData, onNavigate, recentFixtures,}) {
+  const [slideIndex, setSlideIndex] = useState(0)
+const [prevIndex, setPrevIndex] = useState(null)
+const [fading, setFading] = useState(false)
+const [selectedFixture, setSelectedFixture] = useState(null)
 
-  useEffect(() => {
-    const img = new Image()
-    img.onerror = () => setHeroUrl(FALLBACK_HERO)
-    img.src = '/hero-stadium.avif'
-  }, [])
+useEffect(() => {
+  const timer = setInterval(() => {
+    setPrevIndex(slideIndex)
+    setFading(true)
+    setTimeout(() => {
+      setSlideIndex(i => (i + 1) % HERO_SLIDES.length)
+      setFading(false)
+      setPrevIndex(null)
+    }, 800)
+  }, 3000)
+  return () => clearInterval(timer)
+}, [slideIndex])
 
-  const fixtures = homeData.fixtureStrip ?? homeData.recentMatches ?? []
+  const fixtures = recentFixtures ?? []
 
   return (
     <div className="home-page">
       {/* 1. Hero Section */}
       <div className="home-page-bleed">
-        <div
-          className="home-hero-site"
-          style={{
-            backgroundImage: `linear-gradient(to top, rgba(6, 8, 14, 0.95) 0%, rgba(6, 8, 14, 0.45) 42%, rgba(6, 8, 14, 0.2) 100%), url(${heroUrl})`,
-          }}
+  <div className="home-hero-site" style={{ position: 'relative', overflow: 'hidden', background: '#06080e' }}>
+
+    {/* Previous slide fading out */}
+    {prevIndex !== null && (
+      <div
+        style={{
+          position: 'absolute', inset: 0, zIndex: 0,
+          backgroundImage: `linear-gradient(to top, rgba(6,8,14,0.95) 0%, rgba(6,8,14,0.45) 42%, rgba(6,8,14,0.2) 100%), url(${HERO_SLIDES[prevIndex]})`,
+          backgroundSize: 'cover', backgroundPosition: 'center',
+          opacity: fading ? 0 : 1,
+          transition: 'opacity 0.8s ease',
+        }}
+      />
+    )}
+
+    {/* Current slide fading in */}
+    <div
+      style={{
+        position: 'absolute', inset: 0, zIndex: 0,
+        backgroundImage: `linear-gradient(to top, rgba(6,8,14,0.95) 0%, rgba(6,8,14,0.45) 42%, rgba(6,8,14,0.2) 100%), url(${HERO_SLIDES[slideIndex]})`,
+        backgroundSize: 'cover', backgroundPosition: 'center',
+        opacity: fading ? 0 : 1,
+        transition: 'opacity 0.8s ease',
+      }}
+    />
+
+    {/* Text content — sits above both background layers */}
+    <div className="home-hero-site-inner" style={{ position: 'relative', zIndex: 1 }}>
+      <p className="eyebrow">Més que un club</p>
+      <p className="home-hero-tagline">FC Barcelona — for the fans</p>
+      <div className="hero-actions home-hero-actions">
+        <motion.button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => onNavigate('squad')}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.98 }}
         >
-          <div className="home-hero-site-inner">
-            <p className="eyebrow">Més que un club</p>
-            <p className="home-hero-tagline">FC Barcelona — for the fans</p>
-            <div className="hero-actions home-hero-actions">
-              <motion.button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => onNavigate('squad')}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                View squad
-              </motion.button>
-              <motion.button
-                type="button"
-                className="btn btn-ghost btn-hero-secondary"
-                onClick={() => onNavigate('stats')}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                See stats
-              </motion.button>
-            </div>
-          </div>
-        </div>
+          View squad
+        </motion.button>
+        <motion.button
+          type="button"
+          className="btn btn-ghost btn-hero-secondary"
+          onClick={() => onNavigate('stats')}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          See stats
+        </motion.button>
       </div>
+    </div>
+
+  </div>  {/* closes home-hero-site */}
+</div>  {/* closes home-page-bleed */}
 
       {/* 2. Recent Results Section */}
       <section className="home-strip-section">
@@ -70,10 +108,26 @@ export function HomeView({ homeData, onNavigate }) {
         
         <div className="home-fixture-scroll" role="list">
           {fixtures.slice(0, 8).map((match, index) => (
-            <HomeMatchCard key={`${match.MatchDate}-${match.Opponent}-${index}`} match={match} index={index} />
+            <HomeMatchCard
+              key={match.fixtureId}
+              match={match}
+              index={index}
+              onClick={() => setSelectedFixture(match)}
+            />
           ))}
         </div>
       </section>
+
+      {/* Modal */}
+      <AnimatePresence>
+      {selectedFixture && (
+        <MatchStatsModal
+          fixtureId={selectedFixture.fixtureId}
+          matchInfo={selectedFixture}
+          onClose={() => setSelectedFixture(null)}
+        />
+      )}
+      </AnimatePresence>
 
       {/* 3. Honors Section */}
       <motion.div 

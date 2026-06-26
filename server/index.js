@@ -47,23 +47,6 @@ app.get('/api/home-summary', async (_req, res) => {
     const [[nationalitiesCount]] = await pool.query(
       'SELECT COUNT(DISTINCT Nationality) AS totalNationalities FROM PLAYER',
     )
-    const [recentMatches] = await pool.query(
-      `SELECT m.MatchDate, m.Opponent, m.GoalsFor, m.GoalsAgainst, m.Result, m.Venue,
-              c.CompName AS competitionName
-       FROM MATCHES m
-       LEFT JOIN COMPETITION c ON m.CompetitionID = c.CompetitionID
-       ORDER BY m.MatchDate DESC
-       LIMIT 5`,
-    )
-
-    const [fixtureStrip] = await pool.query(
-      `SELECT m.MatchDate, m.Opponent, m.GoalsFor, m.GoalsAgainst, m.Result, m.Venue,
-              c.CompName AS competitionName
-       FROM MATCHES m
-       LEFT JOIN COMPETITION c ON m.CompetitionID = c.CompetitionID
-       ORDER BY m.MatchDate DESC
-       LIMIT 8`,
-    )
 
     res.json({
       ok: true,
@@ -71,8 +54,6 @@ app.get('/api/home-summary', async (_req, res) => {
         totalPlayers: playersCount.totalPlayers,
         totalPositions: positionsCount.totalPositions,
         totalNationalities: nationalitiesCount.totalNationalities,
-        recentMatches,
-        fixtureStrip,
       },
     })
   } catch (error) {
@@ -306,6 +287,91 @@ app.get('/api/matches/all', async (_req, res) => {
     })
   } catch (error) {
     sendError(res, error, 'Could not fetch matches for calendar')
+  }
+})
+
+// Fetch recent Barcelona La Liga fixtures from API-Football
+app.get('/api/fixtures/recent', async (_req, res) => {
+  try {
+    const response = await fetch(
+      'https://v3.football.api-sports.io/fixtures?team=529&season=2024&league=140',
+      {
+        headers: {
+          'x-apisports-key': process.env.FOOTBALL_API_KEY,
+        },
+      }
+    )
+    const json = await response.json()
+
+    // Sort by date desc, take last 8 finished matches
+    const finished = json.response
+      .filter(f => f.fixture.status.short === 'FT')
+      .sort((a, b) => b.fixture.timestamp - a.fixture.timestamp)
+      .slice(0, 8)
+      .map(f => {
+        const isHome = f.teams.home.id === 529
+        const opponent = isHome ? f.teams.away : f.teams.home
+        const goalsFor = isHome ? f.goals.home : f.goals.away
+        const goalsAgainst = isHome ? f.goals.away : f.goals.home
+
+        return {
+          fixtureId: f.fixture.id,
+          date: f.fixture.date,
+          opponent: opponent.name,
+          opponentLogo: opponent.logo,
+          goalsFor,
+          goalsAgainst,
+          result: goalsFor > goalsAgainst ? 'Win' : goalsFor < goalsAgainst ? 'Loss' : 'Draw',
+          venue: isHome ? 'Home' : 'Away',
+          competition: f.league.name,
+          round: f.league.round,
+        }
+      })
+
+    res.json({ ok: true, data: finished })
+  } catch (error) {
+    res.status(500).json({ ok: false, message: error.message })
+  }
+})
+
+// Fetch stats for a specific fixture
+app.get('/api/fixtures/:id/stats', async (req, res) => {
+  try {
+    const response = await fetch(
+      `https://v3.football.api-sports.io/fixtures/statistics?fixture=${req.params.id}`,
+      {
+        headers: {
+          'x-apisports-key': process.env.FOOTBALL_API_KEY,
+        },
+      }
+    )
+    const json = await response.json()
+
+    // Find Barca (id 529) and opponent separately
+    const barca = json.response.find(t => t.team.id === 529)
+    const opponent = json.response.find(t => t.team.id !== 529)
+
+    const parseStats = (statsArray) => {
+      const obj = {}
+      statsArray?.forEach(s => { obj[s.type] = s.value ?? 0 })
+      return obj
+    }
+
+    res.json({
+      ok: true,
+      data: {
+        barca: {
+          team: barca?.team,
+          stats: parseStats(barca?.statistics),
+        },
+        opponent: {
+          team: opponent?.team,
+          stats: parseStats(opponent?.statistics),
+        },
+      },
+    })
+  } catch (error) {
+    res.status(500).json({ ok: false, message: error.message })
   }
 })
 
